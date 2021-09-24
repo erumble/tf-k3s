@@ -24,7 +24,7 @@ resource "kubernetes_manifest" "traefik_external_dashboard" {
       entryPoints = ["web"]
       routes = [{
         kind  = "Rule"
-        match = "PathPrefix(`/dashboard`) || PathPrefix(`/api`)"
+        match = "Host(`traefik.lvh.me`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))"
 
         services = [{
           kind = "TraefikService"
