@@ -1,5 +1,5 @@
 locals {
-  namespace = var.create_namespace ? kubernetes_namespace.this[0].metadata[0].name : data.kubernetes_namespace.this[0].metadata[0].name
+  namespace = var.create_namespace ? kubernetes_namespace.cert_manager[0].metadata[0].name : data.kubernetes_namespace.cert_manager[0].metadata[0].name
 
   affinity = var.pod_affinity_enable ? {
     affinity = {

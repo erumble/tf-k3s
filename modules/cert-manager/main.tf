@@ -1,4 +1,4 @@
-resource "kubernetes_namespace" "this" {
+resource "kubernetes_namespace" "cert_manager" {
   count = var.create_namespace ? 1 : 0
 
   metadata {
@@ -9,7 +9,7 @@ resource "kubernetes_namespace" "this" {
   }
 }
 
-data "kubernetes_namespace" "this" {
+data "kubernetes_namespace" "cert_manager" {
   count = var.create_namespace ? 0 : 1
 
   metadata {
@@ -17,7 +17,7 @@ data "kubernetes_namespace" "this" {
   }
 }
 
-resource "helm_release" "this" {
+resource "helm_release" "cert_manager" {
   namespace       = local.namespace
   name            = "cert-manager"
   repository      = "https://charts.jetstack.io"
