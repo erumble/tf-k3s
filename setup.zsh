@@ -3,6 +3,7 @@
 external_tools=(
   jq
   k3d
+  terraform
 )
 
 for tool in ${(@)external_tools}; do
@@ -43,7 +44,24 @@ arg_err() {
   printf "Invalid option: %s requires an argument\n" $1 1>&2
 }
 
-unset debug
+create_cluster() {
+  k3d cluster create ${args[cluster_name]} \
+    --agents ${args[agent_count]} \
+    --servers ${args[server_count]} \
+    --port "${args[lb_port]}:80@loadbalancer" \
+    --timeout 5m
+}
+
+provision_cluster() {
+  local workspace=k3d-${args[cluster_name]}
+  cat <<-EOF >! vars/${workspace}.tfvars
+	kubernetes_config_context = "${workspace}"
+	EOF
+
+  terraform init
+  terraform workspace select ${workspace} || terraform workspace new ${workspace}
+  terraform apply --var-file=vars/${workspace}.tfvars -auto-approve
+}
 
 while getopts ":a:n:p:s:v" opt; do
   case  $opt in
@@ -63,11 +81,8 @@ fi
 
 cluster_exists=$(k3d cluster list --output json | jq -r ".[] | select(.name==\"${args[cluster_name]}\") | .name")
 if [[ -z $cluster_exists ]]; then
-  k3d cluster create ${args[cluster_name]} \
-    --agents ${args[agent_count]} \
-    --servers ${args[server_count]} \
-    --port "${args[lb_port]}:80@loadbalancer" \
-    --timeout 5m 
+  create_cluster
+  provision_cluster
 else
-  print "Cluster already exits.\n"
+  provision_cluster
 fi
