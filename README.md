@@ -39,12 +39,17 @@ Cleanup
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_cert_manager"></a> [cert\_manager](#module\_cert\_manager) | ./modules/cert-manager | n/a |
+| <a name="module_linkerd"></a> [linkerd](#module\_linkerd) | ./modules/linkerd | n/a |
+| <a name="module_linkerd-viz"></a> [linkerd-viz](#module\_linkerd-viz) | ./modules/linkerd-viz | n/a |
 
 ## Resources
 
 | Name | Type |
 |------|------|
+| [kubernetes_manifest.linkerd_external_dashboard](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
+| [kubernetes_manifest.linkerd_external_dashboard_headers](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
 | [kubernetes_manifest.traefik_external_dashboard](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
+| [kubernetes_manifest.traefik_pod_annotations](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
 
 ## Inputs
 
