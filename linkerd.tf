@@ -19,7 +19,7 @@ resource "kubernetes_manifest" "traefik_pod_annotations" {
     kind       = "HelmChartConfig"
 
     metadata = {
-      name      = "traefik"
+      name      = "traefik-linkerd-mesh"
       namespace = "kube-system"
 
       labels = {
