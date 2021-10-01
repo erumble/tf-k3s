@@ -1,0 +1,15 @@
+{{- $fullName := include "ca-issuer.fullname" . -}}
+{{- $secretName := ternary $fullName .Values.caIssuerSecret (empty .Values.caIssuerSecret) -}}
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "ca-issuer.labels" . | nindent 4 }}
+spec:
+  ca:
+    secretName: {{ $secretName }}
+    {{- with .Values.crlDistributionPoints }}
+    crlDistributionPoints:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}

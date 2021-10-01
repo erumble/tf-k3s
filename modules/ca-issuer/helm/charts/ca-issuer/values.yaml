@@ -1,0 +1,9 @@
+# Default values for ca-issuer.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+clusterIssuer: ""
+caIssuerSecret: ~
+crlDistributionPoints: []

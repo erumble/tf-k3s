@@ -1,0 +1,19 @@
+{{- if not .Values.caIssuerSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "ca-issuer.fullname" . }}
+  labels:
+    {{- include "ca-issuer.labels" . | nindent 4 }}
+spec:
+  isCA: true
+  commonName: {{ include "ca-issuer.fullname" . }}
+  secretName: {{ include "ca-issuer.fullname" . }}
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: {{ .Values.clusterIssuer }}
+    kind: ClusterIssuer
+    group: cert-manager.io
+{{- end }}
