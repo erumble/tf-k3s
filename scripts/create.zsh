@@ -29,7 +29,7 @@ usage() {
   printf "  Create a local K8s cluster using K3s\n"
 
   printf "\nUsage:\n"
-  printf "  setup.zsh [-v] [-n <cluster-name>] [-s <server-count>] [-a <agent-count>]\n"
+  printf "  create.zsh [-v] [-n <cluster-name>] [-s <server-count>] [-a <agent-count>]\n"
 
   printf "\nOptions:\n"
   format="  %-4s%-17s%-34s[Default: %s]\n"
@@ -45,13 +45,11 @@ arg_err() {
 }
 
 create_cluster() {
-  # Prevent k3d from failing due to too many open files on docker.sock
-  ulimit -n 512
-
   k3d cluster create ${args[cluster_name]} \
     --agents ${args[agent_count]} \
     --servers ${args[server_count]} \
     --port "${args[lb_port]}:80@loadbalancer" \
+    --port "8443:443@loadbalancer" \
     --timeout 5m
 }
 
@@ -85,7 +83,7 @@ fi
 cluster_exists=$(k3d cluster list --output json | jq -r ".[] | select(.name==\"${args[cluster_name]}\") | .name")
 if [[ -z $cluster_exists ]]; then
   create_cluster
-  provision_cluster
+  # provision_cluster
 else
   provision_cluster
 fi

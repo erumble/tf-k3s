@@ -1,0 +1,49 @@
+# ---
+# apiVersion: cert-manager.io/v1
+# kind: ClusterIssuer
+# metadata:
+#   name: selfsigned-issuer
+# spec:
+#   selfSigned: {}
+# ---
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: selfsigned-ca
+#   namespace: kube-system
+# spec:
+#   isCA: true
+#   commonName: selfsigned-ca
+#   secretName: root-secret
+#   privateKey:
+#     algorithm: ECDSA
+#     size: 256
+#   issuerRef:
+#     name: selfsigned-issuer
+#     kind: ClusterIssuer
+#     group: cert-manager.io
+# ---
+# apiVersion: cert-manager.io/v1
+# kind: Issuer
+# metadata:
+#   name: ca-issuer
+#   namespace: kube-system
+# spec:
+#   ca:
+#     secretName: root-secret
+# ---
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: traefik-external-dashboard
+#   namespace: kube-system
+# spec:
+#   usages:
+#     - server auth
+#     - client auth
+#   dnsNames:
+#     - traefik.lvh.me
+#   secretName: traefik.lvh.me
+#   issuerRef:
+#     name: ca-issuer
+#     kind: Issuer

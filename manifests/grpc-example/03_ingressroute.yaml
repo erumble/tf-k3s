@@ -1,0 +1,20 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: dune-ingress
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/name: dune-ingress
+  name: dune-ingress
+  namespace: dune
+spec:
+  entryPoints:
+  - web
+  routes:
+  - kind: Rule
+    match: Host(`dune.lvh.me`)
+    services:
+    - kind: Service
+      name: dune-quote-service
+      port: 9001
+      scheme: h2c

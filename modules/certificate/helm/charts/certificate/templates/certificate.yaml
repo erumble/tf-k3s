@@ -1,0 +1,92 @@
+{{- $fullName := include "certificate.fullname" . -}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "certificate.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.commonName }}
+  commonName: {{ .Values.commonName }}
+  {{- end }}
+  {{- with .Values.dnsNames }}
+  dnsNames:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.isCA }}
+  isCA: {{ .Values.isCA }}
+  {{- end }}
+  issuerRef:
+    name: {{ .Values.issuer }}
+    kind: {{ .Values.issuerKind }}
+    group: cert-manager.io
+  {{- with .Values.privateKey }}
+  privateKey:
+    algorithm: {{ .algorithm }}
+    {{- if .encoding }}
+    encoding: {{ .encoding }}
+    {{- end }}
+    {{- if .rotationPolicy }}
+    rotationPolicy: {{ .rotationPolicy }}
+    {{- end }}
+    {{- if .size }}
+    size: {{ .size }}
+    {{- end }}
+  {{- end }}
+  {{- if .Values.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  {{- end }}
+  secretName: {{ default $fullName .Values.secretName }}
+  {{- with .Values.secretTemplate }}
+  secretTemplate:
+    {{- with .annotations }}
+    annotations:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .labels }}
+    labels:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+  {{- with .Values.subject }}
+  subject:
+    {{- with .countries }}
+    countries:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .localities }}
+    localities:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .organizationalUnits }}
+    organizationalUnits:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .organizations }}
+    organizations:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .postalCodes }}
+    postalCodes:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .provinces }}
+    provinces:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- if .serialNumber }}
+    serialNumber: {{ .serialNumber }}
+    {{- end }}
+    {{- with .streetAddresses }}
+    streetAddresses:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+  {{- with .Values.uris }}
+  uris:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.usages }}
+  usages:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

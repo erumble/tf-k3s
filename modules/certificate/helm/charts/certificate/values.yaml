@@ -1,0 +1,107 @@
+# Default values for certificate.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+#
+# Certificate Values
+#
+
+# CommonName is a common name to be used on the Certificate.
+# The CommonName should have a length of 64 characters or fewer to avoid generating invalid CSRs.
+# This value is ignored by TLS clients when any subject alt name is set.
+# This is x509 behaviour: https://tools.ietf.org/html/rfc6125#section-6.4.4
+commonName: ""
+
+# DNSNames is a list of DNS subjectAltNames to be set on the Certificate.
+dnsNames: []
+
+# IsCA will mark this Certificate as valid for certificate signing.
+# This will automatically add the `cert sign` usage to the list of `usages`.
+isCA: false
+
+# Issuer is a reference to the issuer for this certificate.
+issuer: ""
+
+# IssuerKind must be one of Issuer or ClusterIssuer
+issuerKind: ClusterIssuer
+
+# Options to control private keys used for the Certificate.
+privateKey: {}
+# enum values in [] denote default values
+# algorithm must be one of RSA | ECDSA | Ed25519
+# encoding must be one of [PKCS1] | PKCS8
+# rotationPolicy must be one of Always | [Never]
+# size depends on algorithm
+#   RSA -> [2048] | 4096 | 8192
+#   ECDSA -> [256] | 384 | 521
+#   Ed25519 -> ignored
+#
+# privateKey:
+#   algorithm: ECDSA
+#   encoding: PKCS1
+#   rotationPolicy: Always
+#   size: 521
+
+# Max number of previous certs to keep
+# If not set, old certs will not be garbage collected
+revisionHistoryLimit: 3
+
+# secretName defaults to chart's full name
+secretName: ~
+
+# secretTemplate specifies annotations and labels to apply to the secret
+secretTemplate: {}
+# secretTemplate:
+#   annotations:
+#     someAnnotation: someAnnotationValue
+#   labels:
+#     someLabel: someLabelValue
+
+# Full X509 name specification (https://golang.org/pkg/crypto/x509/pkix/#Name)
+subject: {}
+# subject:
+#   countries: [""]
+#   localities: [""]
+#   organizationalUnits: [""]
+#   organizations: [""]
+#   postalCodes: [""]
+#   provinces: [""]
+#   serialNumber: ""
+#   streetAddresses: [""]
+
+# URIs is a list of URI subjectAltNames to be set on the Certificate.
+uris: []
+
+# Usages is the set of x509 usages that are requested for the certificate.
+# Defaults to `digital signature` and `key encipherment` if not specified.
+usages:
+  - server auth
+  - client auth
+# Below is a list of all valid usages
+# usages:
+#   - signing
+#   - digital signature
+#   - content commitment
+#   - key encipherment
+#   - key agreement
+#   - data encipherment
+#   - cert sign
+#   - crl sign
+#   - encipher only
+#   - decipher only
+#   - any
+#   - server auth
+#   - client auth
+#   - code signing
+#   - email protection
+#   - s/mime
+#   - ipsec end system
+#   - ipsec tunnel
+#   - ipsec user
+#   - timestamping
+#   - ocsp signing
+#   - microsoft sgc
+#   - netscape sgc
