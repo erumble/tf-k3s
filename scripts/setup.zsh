@@ -17,7 +17,7 @@ declare -A defaults
 defaults=(
   [agent_count]=3
   [cluster_name]=dev
-  [server_count]=3
+  [server_count]=1
   [lb_port]=8080
 )
 
