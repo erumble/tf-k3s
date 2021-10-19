@@ -45,6 +45,9 @@ arg_err() {
 }
 
 create_cluster() {
+  # Prevent k3d from failing due to too many files open on docker.sock
+  ulimit -n 512
+
   k3d cluster create ${args[cluster_name]} \
     --agents ${args[agent_count]} \
     --servers ${args[server_count]} \
