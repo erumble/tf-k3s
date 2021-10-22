@@ -29,7 +29,7 @@ usage() {
   printf "  Create a local K8s cluster using K3s\n"
 
   printf "\nUsage:\n"
-  printf "  setup.zsh [-v] [-n <cluster-name>] [-s <server-count>] [-a <agent-count>]\n"
+  printf "  create.zsh [-v] [-n <cluster-name>] [-s <server-count>] [-a <agent-count>]\n"
 
   printf "\nOptions:\n"
   format="  %-4s%-17s%-34s[Default: %s]\n"
@@ -52,6 +52,7 @@ create_cluster() {
     --agents ${args[agent_count]} \
     --servers ${args[server_count]} \
     --port "${args[lb_port]}:80@loadbalancer" \
+    --port "8443:443@loadbalancer" \
     --timeout 5m
 }
 
