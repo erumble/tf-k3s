@@ -75,7 +75,6 @@ manual_provision() {
     --namespace argocd \
     --set server.extraArgs={--insecure}
 
-  kubectl apply -f manifests/traefik-ingressroute.yaml
   kubectl apply -f manifests/argocd-ingressroute.yaml
 }
 
