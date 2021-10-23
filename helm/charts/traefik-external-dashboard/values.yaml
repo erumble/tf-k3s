@@ -1,0 +1,8 @@
+# Default values for traefik-external-dashboard.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+host: traefik.lvh.me
