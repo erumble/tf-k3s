@@ -4,6 +4,8 @@ metadata:
   name: cert-manager
   labels:
     {{- include "core-applications.labels" . | nindent 4 }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: cert-manager
