@@ -14,7 +14,6 @@ spec:
     repoURL: https://github.com/erumble/tf-k3s
     targetRevision: argocd
     path: helm/charts/core-applications
-
   syncPolicy:
     automated:
       prune: true

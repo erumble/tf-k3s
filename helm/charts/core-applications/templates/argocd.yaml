@@ -12,7 +12,7 @@ spec:
     server: {{ .Values.spec.destination.server }}
   project: {{ include "core-applications.name" . }}
   source:
-    chart: argocd
+    chart: argo-cd
     repoURL: https://argoproj.github.io/argo-helm
     targetRevision: 3.23.6
     helm:
