@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 
 external_tools=(
+  helm
   jq
   k3d
   terraform
@@ -17,8 +18,8 @@ declare -A defaults
 defaults=(
   [agent_count]=3
   [cluster_name]=dev
-  [server_count]=1
-  [lb_port]=8080
+  [http_port]=8080
+  [https_port]=8443
 )
 
 declare -A args
@@ -34,9 +35,9 @@ usage() {
   printf "\nOptions:\n"
   format="  %-4s%-17s%-34s[Default: %s]\n"
   printf $format "-a" "<agent-count>" "set number of agent containers" $defaults[agent_count]
+  printf $format "-h" "<http-port>" "host port to expose cluster lb HTTP protocol on" $defaults[http_port]
   printf $format "-n" "<cluster-name>" "set cluster name" $defaults[cluster_name]
-  printf $format "-p" "<port>" "port to expose cluster lb on" $defaults[lb_port]
-  printf $format "-s" "<server-count>" "set number of server containers" $defaults[server_count]
+  printf $format "-s" "<https-port>" "host port to expose cluster lb HTTPS protocol on" $defaults[https_port]
   printf $format "-v" "" "show debug info (set -x)" "false"
 }
 
@@ -50,9 +51,9 @@ create_cluster() {
 
   k3d cluster create ${args[cluster_name]} \
     --agents ${args[agent_count]} \
-    --servers ${args[server_count]} \
-    --port "${args[lb_port]}:80@loadbalancer" \
-    --port "8443:443@loadbalancer" \
+    --servers 1 \
+    --port "${args[http_port]}:80@loadbalancer" \
+    --port "${args[https_port]}:443@loadbalancer" \
     --timeout 5m
 }
 
@@ -67,12 +68,23 @@ provision_cluster() {
   terraform apply --var-file=vars/${workspace}.tfvars -auto-approve
 }
 
-while getopts ":a:n:p:s:v" opt; do
+manual_provision() {
+  helm install argocd argo/argo-cd \
+    --atomic \
+    --create-namespace \
+    --namespace argocd \
+    --set server.extraArgs={--insecure}
+
+  kubectl apply -f manifests/traefik-ingressroute.yaml
+  kubectl apply -f manifests/argocd-ingressroute.yaml
+}
+
+while getopts ":a:h:n:s:v" opt; do
   case  $opt in
     a  ) args[agent_count]=$OPTARG;;
+    h  ) args[http_port]=$OPTARG;;
     n  ) args[cluster_name]=$OPTARG;;
-    p  ) args[lb_port]=$OPTARG;;
-    s  ) args[server_count]=$OPTARG;;
+    s  ) args[https_port]=$OPTARG;;
     v  ) args+=( [debug]=true );;
     \? ) usage; exit;;
     :  ) arg_err $OPTARG; exit 1;;
@@ -86,7 +98,9 @@ fi
 cluster_exists=$(k3d cluster list --output json | jq -r ".[] | select(.name==\"${args[cluster_name]}\") | .name")
 if [[ -z $cluster_exists ]]; then
   create_cluster
-  provision_cluster
+  manual_provision
+  # provision_cluster
 else
-  provision_cluster
+  manual_provision
+  # provision_cluster
 fi
