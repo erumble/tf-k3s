@@ -15,7 +15,6 @@ spec:
     repoURL: https://github.com/erumble/tf-k3s
     targetRevision: argocd
     path: helm/charts/traefik-external-dashboard
-    helm: {}
   syncPolicy:
     automated:
       prune: true
