@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: {{- include "core-applications.name" . }}
+  name: {{ include "core-applications.name" . }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:

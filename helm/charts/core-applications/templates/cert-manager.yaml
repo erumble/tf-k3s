@@ -8,7 +8,7 @@ spec:
   destination:
     namespace: cert-manager
     server: {{ .Values.spec.destination.server }}
-  project: {{- include "core-applications.name" . }}
+  project: {{ include "core-applications.name" . }}
   source:
     chart: cert-manager
     repoURL: https://charts.jetstack.io
