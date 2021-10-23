@@ -12,7 +12,6 @@ spec:
     server: {{ .Values.spec.destination.server }}
   project: {{ include "core-applications.name" . }}
   source:
-    chart: traefik-external-dashboard
     repoURL: https://github.com/erumble/tf-k3s
     targetRevision: argocd
     path: helm/charts/traefik-external-dashboard
