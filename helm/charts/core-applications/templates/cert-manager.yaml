@@ -6,6 +6,8 @@ metadata:
     {{- include "core-applications.labels" . | nindent 4 }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
 spec:
   destination:
     namespace: cert-manager

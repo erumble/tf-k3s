@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-2"
+    argocd.argoproj.io/sync-wave: "-5"
   name: {{ include "core-applications.name" . }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
