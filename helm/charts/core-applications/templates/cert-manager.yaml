@@ -15,18 +15,18 @@ spec:
     targetRevision: 1.5.4
     helm:
       parameters:
-      - name: installCRDs
-        value: "true"
-      - name: global.podSecurityPolicy.enable
-        value: "true"
-      - name: global.leaderElection.namespace
-        value: cert-manager
-      - name: replicaCount
-        value: "2"
-      - name: cainjector.replicaCount
-        value: "2"
-      - name: webhook.replicaCount
-        value: "2"
+        - name: installCRDs
+          value: "true"
+        - name: global.podSecurityPolicy.enable
+          value: "true"
+        - name: global.leaderElection.namespace
+          value: cert-manager
+        - name: replicaCount
+          value: "2"
+        - name: cainjector.replicaCount
+          value: "2"
+        - name: webhook.replicaCount
+          value: "2"
       values: |
         affinity:
           podAntiAffinity:

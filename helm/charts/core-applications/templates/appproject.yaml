@@ -8,3 +8,11 @@ metadata:
     {{- include "core-applications.labels" . | nindent 4 }}
 spec:
   description: Core components of k8s cluster
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      server: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
