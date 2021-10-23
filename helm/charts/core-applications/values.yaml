@@ -1,0 +1,10 @@
+# Default values for core-applications.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+spec:
+  destination:
+    server: https://kubernetes.default.svc

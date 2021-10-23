@@ -1,0 +1,10 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{- include "core-applications.name" . }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    {{- include "core-applications.labels" . | nindent 4 }}
+spec:
+  description: Core components of k8s cluster

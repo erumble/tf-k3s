@@ -1,0 +1,68 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  labels:
+    {{- include "core-applications.labels" . | nindent 4 }}
+spec:
+  destination:
+    namespace: cert-manager
+    server: {{ .Values.spec.destination.server }}
+  project: {{- include "core-applications.name" . }}
+  source:
+    chart: cert-manager
+    repoURL: https://charts.jetstack.io
+    targetRevision: 1.5.4
+    helm:
+      parameters:
+      - name: installCRDs
+        value: "true"
+      - name: global.podSecurityPolicy.enable
+        value: "true"
+      - name: global.leaderElection.namespace
+        value: cert-manager
+      - name: replicaCount
+        value: "2"
+      - name: cainjector.replicaCount
+        value: "2"
+      - name: webhook.replicaCount
+        value: "2"
+      values: |
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - cert-manager
+              topologyKey: kubernetes.io/hostname
+        cainjector:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                    - cainjector
+                topologyKey: kubernetes.io/hostname
+        webhook:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                    - webhook
+                topologyKey: kubernetes.io/hostname
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
