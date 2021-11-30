@@ -44,7 +44,16 @@ usage() {
   format="  %s\n"
   printf $format "helm repo add argo https://argoproj.github.io/argo-helm"
   printf $format "helm repo add jetstack https://charts.jetstack.io"
+  printf $format "helm repo add linkerd https://helm.linkerd.io/stable"
   printf $format "helm repo add traefik https://helm.traefik.io/traefik"
+
+  help_argocd_pw
+}
+
+help_argocd_pw() {
+  printf "\nRun the following command to get the admin password for ArgoCD:\n"
+  local format="  %s\n"
+  printf $format "kubectl -n argocd get secret/argocd-initial-admin-secret --template={{.data.password}} | base64 -D"
 }
 
 arg_err() {
@@ -73,8 +82,7 @@ provision_cluster() {
   terraform workspace select ${workspace} || terraform workspace new ${workspace}
   terraform apply --var-file=vars/${workspace}.tfvars -auto-approve
 
-  print "\nRun the following command to get the admin password for ArgoCD:\n"
-  print "  kubectl -n argocd get secret/argocd-initial-admin-secret --template={{.data.password}} | base64 -D\n\n"
+  help_argocd_pw
 }
 
 while getopts ":a:hn:p:s:v" opt; do
@@ -101,3 +109,4 @@ if [[ -z $cluster_exists ]]; then
 else
   provision_cluster
 fi
+
