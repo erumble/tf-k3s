@@ -1,23 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: traefik-external-dashboard
+  name: argocd-dashboard
   labels:
     {{- include "core-applications.labels" . | nindent 4 }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  destination:
-    namespace: kube-system
-    server: {{ .Values.spec.destination.server }}
   project: {{ include "core-applications.name" . }}
   source:
-    repoURL: https://github.com/erumble/tf-k3s
+    repoURL: https://github.com/erumble/tf-k3s.git
     targetRevision: argocd
-    path: helm/charts/traefik-external-dashboard
+    path: manifests/dashboards/argocd
+  destination:
+    namespace: argocd
+    server: {{ .Values.spec.destination.server }}
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
+      - CreateNamespace=true

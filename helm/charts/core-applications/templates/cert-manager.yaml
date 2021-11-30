@@ -9,14 +9,11 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-2"
 spec:
-  destination:
-    namespace: cert-manager
-    server: {{ .Values.spec.destination.server }}
   project: {{ include "core-applications.name" . }}
   source:
     chart: cert-manager
     repoURL: https://charts.jetstack.io
-    targetRevision: 1.5.4
+    targetRevision: 1.6.1
     helm:
       parameters:
         - name: installCRDs
@@ -64,9 +61,12 @@ spec:
                     values:
                     - webhook
                 topologyKey: kubernetes.io/hostname
+  destination:
+    namespace: cert-manager
+    server: {{ .Values.spec.destination.server }}
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
+      - CreateNamespace=true
