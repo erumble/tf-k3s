@@ -70,3 +70,33 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager-trust
+  labels:
+    {{- include "core-applications.labels" . | nindent 4 }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "-6"
+spec:
+  project: {{ include "core-applications.name" . }}
+  source:
+    chart: cert-manager-trust
+    repoURL: https://charts.jetstack.io
+    targetRevision: 0.1.1
+    helm:
+      parameters:
+        - name: app.trust.namespace
+          value: linkerd
+  destination:
+    namespace: linkerd
+    server: {{ .Values.spec.destination.server }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
