@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: traefik-dashboard
+  name: traefik-external-dashboard
   labels:
     {{- include "core-applications.labels" . | nindent 4 }}
   finalizers:
@@ -11,7 +11,15 @@ spec:
   source:
     repoURL: https://github.com/erumble/tf-k3s
     targetRevision: argocd
-    path: manifests/dashboards/traefik
+    path: helm/charts/dashboard
+    helm:
+      values: |
+        routes:
+          - kind: Rule
+            match: Host(`traefik.lvh.me`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+            services:
+              - kind: TraefikService
+                name: api@internal
   destination:
     namespace: kube-system
     server: {{ .Values.spec.destination.server }}

@@ -38,9 +38,23 @@ metadata:
 spec:
   project: {{ include "core-applications.name" . }}
   source:
-    repoURL: https://github.com/erumble/tf-k3s.git
+    repoURL: https://github.com/erumble/tf-k3s
     targetRevision: argocd
-    path: manifests/dashboards/argocd
+    path: helm/charts/dashboard
+    helm:
+      values: |
+        routes:
+          - match: Host(`argocd.lvh.me`)
+            priority: 10
+            services:
+              - name: argocd-server
+                port: 80
+          - match: Host(`argocd.lvh.me`) && Headers(`Content-Type`, `application/grpc`)
+            priority: 11
+            services:
+              - name: argocd-server
+                port: 80
+                scheme: h2c
   destination:
     namespace: argocd
     server: {{ .Values.spec.destination.server }}
