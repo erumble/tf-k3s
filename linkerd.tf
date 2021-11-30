@@ -1,3 +1,4 @@
+/*
 module "linkerd" {
   source = "./modules/linkerd"
 }
@@ -112,3 +113,5 @@ resource "kubernetes_manifest" "linkerd_external_dashboard_headers" {
     }
   }
 }
+
+*/
