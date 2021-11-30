@@ -1,0 +1,28 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "dashboard.fullname" . }}
+  labels:
+    {{- include "dashboard.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+    {{- toYaml .Values.entryPoints | nindent 4 }}
+  routes:
+    {{- range $route := .Values.routes }}
+    - kind: Rule
+      match: $route.match
+      {{- if $route.priority }}
+      priority: {{ $route.priority }}
+      {{- end }}
+      {{- with $route.middlewares }}
+      middlewares:
+        {{- toYaml . | nindent 8}}
+      {{- end }}
+      services:
+        {{- toYaml $route.services | nindent 8 }}
+    {{- end }}
+  {{- with .Values.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+

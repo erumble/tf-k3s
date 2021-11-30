@@ -1,0 +1,52 @@
+# Default values for dashboard.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+entryPoints:
+  - web
+
+routes: []
+tls: {}
+
+# See https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/#kind-ingressroute
+# for more info
+# entryPoints:                      # [1]
+#   - foo
+# routes:                           # [2]
+# - match: Host(`test.example.com`) # [3]
+#   priority: 10                    # [4]
+#   middlewares:                    # [5]
+#   - name: middleware1             # [6]
+#     namespace: default            # [7]
+#   services:                       # [8]
+#   - kind: Service
+#     name: foo
+#     namespace: default
+#     passHostHeader: true
+#     port: 80                      # [9]
+#     responseForwarding:
+#       flushInterval: 1ms
+#     scheme: https
+#     serversTransport: transport   # [10]
+#     sticky:
+#       cookie:
+#         httpOnly: true
+#         name: cookie
+#         secure: true
+#         sameSite: none
+#     strategy: RoundRobin
+#     weight: 10
+# tls:                              # [11]
+#   secretName: supersecret         # [12]
+#   options:                        # [13]
+#     name: opt                     # [14]
+#     namespace: default            # [15]
+#   certResolver: foo               # [16]
+#   domains:                        # [17]
+#   - main: example.net             # [18]
+#     sans:                         # [19]
+#     - a.example.net
+#     - b.example.net
