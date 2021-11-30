@@ -35,10 +35,16 @@ usage() {
   printf "\nOptions:\n"
   format="  %-4s%-17s%-34s[Default: %s]\n"
   printf $format "-a" "<agent-count>" "set number of agent containers" $defaults[agent_count]
-  printf $format "-h" "<http-port>" "host port to expose cluster lb HTTP protocol on" $defaults[http_port]
   printf $format "-n" "<cluster-name>" "set cluster name" $defaults[cluster_name]
-  printf $format "-s" "<https-port>" "host port to expose cluster lb HTTPS protocol on" $defaults[https_port]
+  printf $format "-p" "<http-port>" "port to expose HTTP on" $defaults[http_port]
+  printf $format "-s" "<https-port>" "port to expose HTTPS on" $defaults[https_port]
   printf $format "-v" "" "show debug info (set -x)" "false"
+
+  printf "\nUse the following commands to add the Helm repos used by this project:\n"
+  format="  %s\n"
+  printf $format "helm repo add argo https://argoproj.github.io/argo-helm"
+  printf $format "helm repo add jetstack https://charts.jetstack.io"
+  printf $format "helm repo add traefik https://helm.traefik.io/traefik"
 }
 
 arg_err() {
@@ -66,23 +72,17 @@ provision_cluster() {
   terraform init
   terraform workspace select ${workspace} || terraform workspace new ${workspace}
   terraform apply --var-file=vars/${workspace}.tfvars -auto-approve
+
+  print "\nRun the following command to get the admin password for ArgoCD:\n"
+  print "  kubectl -n argocd get secret/argocd-initial-admin-secret --template={{.data.password}} | base64 -D\n\n"
 }
 
-manual_provision() {
-  helm install argocd argo/argo-cd \
-    --atomic \
-    --create-namespace \
-    --namespace argocd \
-    --set server.extraArgs={--insecure}
-
-  kubectl apply -f manifests/argocd-ingressroute.yaml
-}
-
-while getopts ":a:h:n:s:v" opt; do
+while getopts ":a:hn:p:s:v" opt; do
   case  $opt in
     a  ) args[agent_count]=$OPTARG;;
-    h  ) args[http_port]=$OPTARG;;
+    h  ) usage; exit;;
     n  ) args[cluster_name]=$OPTARG;;
+    p  ) args[http_port]=$OPTARG;;
     s  ) args[https_port]=$OPTARG;;
     v  ) args+=( [debug]=true );;
     \? ) usage; exit;;
@@ -97,9 +97,7 @@ fi
 cluster_exists=$(k3d cluster list --output json | jq -r ".[] | select(.name==\"${args[cluster_name]}\") | .name")
 if [[ -z $cluster_exists ]]; then
   create_cluster
-  manual_provision
-  # provision_cluster
+  provision_cluster
 else
-  manual_provision
-  # provision_cluster
+  provision_cluster
 fi
