@@ -4,7 +4,7 @@ external_tools=(
   helm
   jq
   k3d
-  terraform
+  step
 )
 
 for tool in ${(@)external_tools}; do
@@ -58,17 +58,6 @@ create_cluster() {
 }
 
 provision_cluster() {
-  local workspace=k3d-${args[cluster_name]}
-  cat <<-EOF >! vars/${workspace}.tfvars
-	kubernetes_config_context = "${workspace}"
-	EOF
-
-  terraform init
-  terraform workspace select ${workspace} || terraform workspace new ${workspace}
-  terraform apply --var-file=vars/${workspace}.tfvars -auto-approve
-}
-
-manual_provision() {
   helm install argocd argo/argo-cd \
     --atomic \
     --create-namespace \
@@ -76,6 +65,9 @@ manual_provision() {
     --set server.extraArgs={--insecure}
 
   kubectl apply -f manifests/argocd-ingressroute.yaml
+
+  # Restart all pods to make sure they join the service mesh
+  kubectl get namespaces -o json | jq -r '.items[].metadata.name' | xargs -n 1 -I{} kubectl -n {} rollout restart deployments
 }
 
 while getopts ":a:h:n:s:v" opt; do
@@ -97,9 +89,7 @@ fi
 cluster_exists=$(k3d cluster list --output json | jq -r ".[] | select(.name==\"${args[cluster_name]}\") | .name")
 if [[ -z $cluster_exists ]]; then
   create_cluster
-  manual_provision
-  # provision_cluster
+  provision_cluster
 else
-  manual_provision
-  # provision_cluster
+  provision_cluster
 fi

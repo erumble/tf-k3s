@@ -26,13 +26,11 @@ usage() {
 
 cleanup() {
   k3d cluster delete --all
-  rm -f vars/*
-  rm -rf .terraform
 }
 
 while getopts ":fh" opt; do
   case  $opt in
-	f  ) cleanup; exit;;
+	  f  ) cleanup; exit;;
     h  ) usage; exit;;
     \? ) usage; exit;;
   esac
