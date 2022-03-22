@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 
 external_tools=(
+  helm
   jq
   k3d
   terraform
@@ -17,8 +18,8 @@ declare -A defaults
 defaults=(
   [agent_count]=3
   [cluster_name]=dev
-  [server_count]=1
-  [lb_port]=8080
+  [http_port]=8080
+  [https_port]=8443
 )
 
 declare -A args
@@ -29,15 +30,30 @@ usage() {
   printf "  Create a local K8s cluster using K3s\n"
 
   printf "\nUsage:\n"
-  printf "  setup.zsh [-v] [-n <cluster-name>] [-s <server-count>] [-a <agent-count>]\n"
+  printf "  create.zsh [-v] [-n <cluster-name>] [-s <server-count>] [-a <agent-count>]\n"
 
   printf "\nOptions:\n"
   format="  %-4s%-17s%-34s[Default: %s]\n"
   printf $format "-a" "<agent-count>" "set number of agent containers" $defaults[agent_count]
   printf $format "-n" "<cluster-name>" "set cluster name" $defaults[cluster_name]
-  printf $format "-p" "<port>" "port to expose cluster lb on" $defaults[lb_port]
-  printf $format "-s" "<server-count>" "set number of server containers" $defaults[server_count]
+  printf $format "-p" "<http-port>" "port to expose HTTP on" $defaults[http_port]
+  printf $format "-s" "<https-port>" "port to expose HTTPS on" $defaults[https_port]
   printf $format "-v" "" "show debug info (set -x)" "false"
+
+  printf "\nUse the following commands to add the Helm repos used by this project:\n"
+  format="  %s\n"
+  printf $format "helm repo add argo https://argoproj.github.io/argo-helm"
+  printf $format "helm repo add jetstack https://charts.jetstack.io"
+  printf $format "helm repo add linkerd https://helm.linkerd.io/stable"
+  printf $format "helm repo add traefik https://helm.traefik.io/traefik"
+
+  help_argocd_pw
+}
+
+help_argocd_pw() {
+  printf "\nRun the following command to get the admin password for ArgoCD:\n"
+  local format="  %s\n"
+  printf $format "kubectl -n argocd get secret/argocd-initial-admin-secret --template={{.data.password}} | base64 -D"
 }
 
 arg_err() {
@@ -50,8 +66,9 @@ create_cluster() {
 
   k3d cluster create ${args[cluster_name]} \
     --agents ${args[agent_count]} \
-    --servers ${args[server_count]} \
-    --port "${args[lb_port]}:80@loadbalancer" \
+    --servers 1 \
+    --port "${args[http_port]}:80@loadbalancer" \
+    --port "${args[https_port]}:443@loadbalancer" \
     --timeout 5m
 }
 
@@ -64,14 +81,17 @@ provision_cluster() {
   terraform init
   terraform workspace select ${workspace} || terraform workspace new ${workspace}
   terraform apply --var-file=vars/${workspace}.tfvars -auto-approve
+
+  help_argocd_pw
 }
 
-while getopts ":a:n:p:s:v" opt; do
+while getopts ":a:hn:p:s:v" opt; do
   case  $opt in
     a  ) args[agent_count]=$OPTARG;;
+    h  ) usage; exit;;
     n  ) args[cluster_name]=$OPTARG;;
-    p  ) args[lb_port]=$OPTARG;;
-    s  ) args[server_count]=$OPTARG;;
+    p  ) args[http_port]=$OPTARG;;
+    s  ) args[https_port]=$OPTARG;;
     v  ) args+=( [debug]=true );;
     \? ) usage; exit;;
     :  ) arg_err $OPTARG; exit 1;;
@@ -89,3 +109,4 @@ if [[ -z $cluster_exists ]]; then
 else
   provision_cluster
 fi
+

@@ -16,7 +16,7 @@ usage() {
   printf "  Removes all traces of all the things.\n"
 
   printf "\nUsage:\n"
-  printf "  cleanup.zsh\n"
+  printf "  destroy.zsh\n"
 
   printf "\nOptions:\n"
   format="  %-4s%s\n"
