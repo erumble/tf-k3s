@@ -32,7 +32,7 @@ cleanup() {
 
 while getopts ":fh" opt; do
   case  $opt in
-	f  ) cleanup; exit;;
+    f  ) cleanup; exit;;
     h  ) usage; exit;;
     \? ) usage; exit;;
   esac
